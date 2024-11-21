@@ -11,8 +11,9 @@ This tool will create all of the Bicep necessary for creating the entire environ
 
 ## Proposed usage
 
+- `forge fire` - Fires up the app for local development
 - `forge temper [-env {dev}]` - Generate the relevant configuration files
-- `forge ignite [-env {dev}]` - Deploy
+- `forge forge [-env {dev}]` - Meta af. Deploy to the cloud!
 
 - ## Goals
 
