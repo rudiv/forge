@@ -43,6 +43,7 @@ public class DotnetWrapper
         {
             DotnetCommand.Run => ["run", "--project", $"{config.ProjectPath}"],
             DotnetCommand.Watch => ["watch", "--no-launch-profile", "--non-interactive", "--project", $"{config.ProjectPath}" ],
+            DotnetCommand.WatchNoHotReload => ["watch", "--no-hot-reload", "--no-launch-profile", "--non-interactive", "--project", $"{config.ProjectPath}"],
             _ => throw new ArgumentOutOfRangeException()
         };
 
@@ -126,10 +127,12 @@ public class DotnetWrapperConfiguration
     
     public Action<string>? OutputPipe { get; set; }
     public Action<string>? ErrorPipe { get; set; }
+
 }
 
 public enum DotnetCommand
 {
     Run,
-    Watch
-}
+    Watch,
+    WatchNoHotReload
+} 

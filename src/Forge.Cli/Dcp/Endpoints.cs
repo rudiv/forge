@@ -11,6 +11,12 @@ public class Endpoints(ILogger<Endpoints> logger, ManagedSessionRegistry session
 {
     // ReSharper disable once InconsistentNaming
     private static readonly string[] protocols_supported = [ "2024-03-03" ];
+    private bool hotReload = true;
+
+    public void SetNoHotReload()
+    {
+        hotReload = false;
+    }
 
     public Task InfoEndpoint(HttpContext ctx) => ctx.Response.WriteAsJsonAsync(new { protocols_supported });
     
@@ -21,7 +27,7 @@ public class Endpoints(ILogger<Endpoints> logger, ManagedSessionRegistry session
         {
             var process = new DotnetWrapper(o =>
             {
-                o.Command = DotnetCommand.Watch;
+                o.Command = hotReload ? DotnetCommand.Watch : DotnetCommand.WatchNoHotReload;
                 o.ConnectChannel = true;
                 o.EnvironmentVariables = session.Env.ToDictionary(m => m.Name, m => m.Value);
                 o.ProjectPath = session.LaunchConfigurations.First().ProjectPath;

@@ -11,7 +11,7 @@ using Spectre.Console.Cli;
 
 namespace Forge.Cli.Commands;
 
-public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost dcpSessionWebHost, ILogger<WatchCommand> logger) : AsyncCommand<WatchCommandSettings>
+public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost dcpSessionWebHost, Endpoints endpoints, ILogger<WatchCommand> logger) : AsyncCommand<WatchCommandSettings>
 {
     public override async Task<int> ExecuteAsync(CommandContext context, WatchCommandSettings settings)
     {
@@ -30,9 +30,9 @@ public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost
             .StartAsync(":fire: Firing...", async ctx =>
             {
                 ctx.Spinner(Spinner.Known.Hamburger);
+                if (settings.NoHotReload) endpoints.SetNoHotReload();
                 await dcpSessionWebHost.StartWebHostAsync(settings.Port);
                 var startupTs = new TaskCompletionSource<bool>();
-                logger.LogTrace("Started...");
                 wrapper = new DotnetWrapper(o =>
                 {
                     o.Command = DotnetCommand.Run;
@@ -66,6 +66,7 @@ public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost
                 wrapper.Start();
                 _ = wrapper.InnerTask.Task.ContinueWith(o =>
                 {
+                    logger.LogTrace("AppHost exited with code {0} after {1}", o.Result.ExitCode, o.Result.RunTime);
                     startupTs.TrySetResult(false);
                 }, TaskContinuationOptions.ExecuteSynchronously);
                 var started = await startupTs.Task;
@@ -96,6 +97,9 @@ public class WatchCommandSettings : CommandSettings
 {
     [CommandOption("--apphost-build-output")]
     public bool ShowBuildOutput { get; set; }
+    
+    [CommandOption("--no-hot-reload")]
+    public bool NoHotReload { get; set; }
     
     [CommandOption("-p|--port")]
     [DefaultValue(6969)]
