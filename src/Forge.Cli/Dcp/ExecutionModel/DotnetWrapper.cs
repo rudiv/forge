@@ -35,7 +35,7 @@ public class DotnetWrapper
         
         var psi = new ProcessStartInfo("dotnet")
         {
-            Arguments = (config.Command == DotnetCommand.Run ? "run --project " : "watch --no-launch-profile --project ") + config.ProjectPath,
+            Arguments = (config.Command == DotnetCommand.Run ? "run --project " : "watch --no-launch-profile --non-interactive --project ") + config.ProjectPath,
             RedirectStandardError = true,
             RedirectStandardOutput = true,
             UseShellExecute = false,
