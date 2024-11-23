@@ -17,7 +17,6 @@ public class Endpoints(ILogger<Endpoints> logger, ManagedSessionRegistry session
     public async Task<IResult> RunSessionEndpoint([FromBody] Session session, HttpContext ctx)
     {
         logger.LogTrace("DCP is trying to start a new session!");
-        logger.LogTrace("Session: {Session}", JsonSerializer.Serialize(session));
         try
         {
             var process = new DotnetWrapper(o =>
@@ -36,6 +35,23 @@ public class Endpoints(ILogger<Endpoints> logger, ManagedSessionRegistry session
         catch (Exception ex)
         {
             logger.LogCritical(ex, "Failed to start session - " + ex.Message);
+            logger.LogCritical(ex.StackTrace);
+            return TypedResults.InternalServerError();
+        }
+    }
+    
+    public async Task<IResult> DeleteSessionEndpoint([FromRoute] Guid id)
+    {
+        logger.LogTrace("DCP is trying to stop a session!");
+        logger.LogTrace("Session: {Session}", id);
+        try
+        {
+            await sessionRegistry.StopSession(id);
+            return TypedResults.Ok();
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, "Failed to stop session - " + ex.Message);
             logger.LogCritical(ex.StackTrace);
             return TypedResults.InternalServerError();
         }

@@ -35,7 +35,9 @@ public class DcpSessionWebHost(ILogger<DcpSessionWebHost> logger, Endpoints endp
         app.Use(notificationStreamHandler.Middleware);
         app.MapGet("/info", endpoints.InfoEndpoint);
         app.MapPut("/run_session", endpoints.RunSessionEndpoint);
+        app.MapDelete("/run_session/{id}", endpoints.DeleteSessionEndpoint);
         await app.StartAsync();
+        logger.LogTrace("WebHost started.");
         currentHost = app;
     }
     

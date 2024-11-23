@@ -42,24 +42,15 @@ app.Configure(o =>
 });
 await app.RunAsync(args);
 
-if (DotnetWrapper.Instances.Count > 0 && DotnetWrapper.Instances.Any(m => m.InnerProcess.HasExited == false))
+// Give a little time for processes to stop
+await Task.Delay(750);
+var openProcesses = DotnetWrapper.Instances.Where(dnw => dnw.InnerTask?.Task.IsCompleted == false).ToList();
+if (openProcesses.Count > 0)
 {
-    AnsiConsole.MarkupLine("[red bold]Still have {0} running instances, stopping...[/]", DotnetWrapper.Instances.Count);
-    AnsiConsole.MarkupLine("This may take a while...");
-    foreach(var dnw in DotnetWrapper.Instances.ToList())
+    AnsiConsole.MarkupLine("[dim]Still have {0} running instances, stopping...[/]", openProcesses.Count);
+    foreach (var dnw in openProcesses)
     {
         await dnw.StopAsync();
     }
-
-    if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-    {
-        AnsiConsole.MarkupLine("Done. Hold on, checking DCP in a few seconds...");
-        await Task.Delay(5_000);
-        Process.Start("/bin/sh", "-c -- \"ps -A | grep dcp\"");
-        AnsiConsole.MarkupLine("If any dcp processes are still there, you should kill them.");
-    }
-    else
-    {
-        AnsiConsole.MarkupLine("Done.");
-    }
 }
+return 0;

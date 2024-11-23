@@ -42,37 +42,35 @@ public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost
                         { "DEBUG_SESSION_TOKEN", Guid.NewGuid().ToString() }
                     };
                     o.ProjectPath = appHostResolution.AppHostPath;
+                    o.OutputPipe = (op) =>
+                    {
+                        if (op.Contains("Login to the dashboard at"))
+                        {
+                            AnsiConsole.MarkupLine("[bold]AppHost started: " + op.Trim().EscapeMarkup() + "[/]");
+                            
+                            startupTs.TrySetResult(true);
+                        }
+                        if (settings.ShowBuildOutput)
+                        {
+                            AnsiConsole.MarkupLineInterpolated(CultureInfo.InvariantCulture, $"[grey]{op}[/]");
+                        }
+                    };
+                    o.ErrorPipe = (op) =>
+                    {
+                        if (settings.ShowBuildOutput)
+                        {
+                            AnsiConsole.MarkupLineInterpolated(CultureInfo.InvariantCulture, $"[red]{op}[/]");
+                        }
+                    };
                 });
-                await wrapper.StartAsync();
-                wrapper.InnerProcess!.OutputDataReceived += (sender, args) =>
+                wrapper.Start();
+                _ = wrapper.InnerTask.Task.ContinueWith(o =>
                 {
-                    if (args.Data == null) return;
-                    if (args.Data.Contains("Login to the dashboard at"))
-                    {
-                        AnsiConsole.MarkupLine("[bold]AppHost started: " + args.Data.Trim().EscapeMarkup() + "[/]");
-                        startupTs.TrySetResult(true);
-                    }
-                    if (settings.ShowBuildOutput)
-                    {
-                        AnsiConsole.MarkupLineInterpolated(CultureInfo.InvariantCulture, $"[grey]{args.Data!}[/]");
-                    }
-                };
-                wrapper.InnerProcess!.ErrorDataReceived += (sender, args) =>
-                {
-                    if (settings.ShowBuildOutput) {
-                        AnsiConsole.MarkupLineInterpolated(CultureInfo.InvariantCulture, $"[red]{args.Data!}[/]");
-                    }
-                };
-                wrapper.InnerProcess.Exited += (sender, args) =>
-                {
-                    logger.LogTrace("Exiting?");
-                    startupTs.TrySetResult(false); // Stop the endless loop
-                    _ = dcpSessionWebHost.StopWebHostAsync();
-                };
+                    startupTs.TrySetResult(false);
+                }, TaskContinuationOptions.ExecuteSynchronously);
                 var started = await startupTs.Task;
                 if (started)
                 {
-                    await Task.Delay(5000);
                     AnsiConsole.MarkupLine("[green]:fire: forge fired. Enjoy hacking on Aspire with a working [italic]dotnet watch[/].[/]");
                 }
                 else
@@ -83,21 +81,15 @@ public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost
                         AnsiConsole.MarkupLine("Re-run forge with --apphost-build-output to see the build output.");
                     }
                 }
-                // Just wait a lil for DCP to request some stuff
             });
 
-        if (wrapper.InnerProcess is { HasExited: false })
+        if (!wrapper.InnerTask.Task.IsCompleted)
         {
-            await wrapper!.InnerProcess!.WaitForExitAsync();
+            await wrapper!.InnerTask;
         }
         
         return 0;
     }
-    
-    [DllImport("libc", SetLastError = true)]
-    private static extern int kill(int pid, int sig);
-
-    private const int SIGINT = 2;
 }
 
 public class WatchCommandSettings : CommandSettings
