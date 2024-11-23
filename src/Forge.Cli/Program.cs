@@ -42,7 +42,7 @@ app.Configure(o =>
 });
 await app.RunAsync(args);
 
-if (DotnetWrapper.Instances.Count > 0)
+if (DotnetWrapper.Instances.Count > 0 && DotnetWrapper.Instances.Any(m => m.InnerProcess.HasExited == false))
 {
     AnsiConsole.MarkupLine("[red bold]Still have {0} running instances, stopping...[/]", DotnetWrapper.Instances.Count);
     AnsiConsole.MarkupLine("This may take a while...");

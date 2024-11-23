@@ -24,14 +24,14 @@ public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost
         
         var withoutExt = Path.GetFileNameWithoutExtension(appHostResolution.AppHostPath);
         AnsiConsole.MarkupLine("[green]:fire: Forging {0}.[/]", withoutExt);
-        DotnetWrapper? wrapper = null;
+        DotnetWrapper wrapper = null!;
 
         await AnsiConsole.Status()
             .StartAsync(":fire: Firing...", async ctx =>
             {
                 ctx.Spinner(Spinner.Known.Hamburger);
                 await dcpSessionWebHost.StartWebHostAsync(settings.Port);
-                var startupTs = new TaskCompletionSource();
+                var startupTs = new TaskCompletionSource<bool>();
                 logger.LogTrace("Started...");
                 wrapper = new DotnetWrapper(o =>
                 {
@@ -50,7 +50,7 @@ public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost
                     if (args.Data.Contains("Login to the dashboard at"))
                     {
                         AnsiConsole.MarkupLine("[bold]AppHost started: " + args.Data.Trim().EscapeMarkup() + "[/]");
-                        startupTs.SetResult();
+                        startupTs.TrySetResult(true);
                     }
                     if (settings.ShowBuildOutput)
                     {
@@ -66,15 +66,30 @@ public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost
                 wrapper.InnerProcess.Exited += (sender, args) =>
                 {
                     logger.LogTrace("Exiting?");
+                    startupTs.TrySetResult(false); // Stop the endless loop
                     _ = dcpSessionWebHost.StopWebHostAsync();
                 };
-                await startupTs.Task;
+                var started = await startupTs.Task;
+                if (started)
+                {
+                    await Task.Delay(5000);
+                    AnsiConsole.MarkupLine("[green]:fire: forge fired. Enjoy hacking on Aspire with a working [italic]dotnet watch[/].[/]");
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine("[red]:fire_extinguisher: forge failed to fire. This probably means your AppHost failed to build.[/]");
+                    if (!settings.ShowBuildOutput)
+                    {
+                        AnsiConsole.MarkupLine("Re-run forge with --apphost-build-output to see the build output.");
+                    }
+                }
                 // Just wait a lil for DCP to request some stuff
-                await Task.Delay(5000);
             });
-        
-        AnsiConsole.MarkupLine("[green]:fire: forge fired. Enjoy hacking on Aspire with a working [italic]dotnet watch[/].[/]");
-        await wrapper!.InnerProcess!.WaitForExitAsync();
+
+        if (wrapper.InnerProcess is { HasExited: false })
+        {
+            await wrapper!.InnerProcess!.WaitForExitAsync();
+        }
         
         return 0;
     }
