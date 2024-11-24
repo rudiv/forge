@@ -42,6 +42,9 @@ app.Configure(o =>
 });
 await app.RunAsync(args);
 
+AnsiConsole.WriteLine();
+AnsiConsole.MarkupLine("[dim]:fire_extinguisher: Shutting down...[/]");
+
 // Give a little time for processes to stop
 await Task.Delay(750);
 var openProcesses = DotnetWrapper.Instances.Where(dnw => dnw.InnerTask?.Task.IsCompleted == false).ToList();
