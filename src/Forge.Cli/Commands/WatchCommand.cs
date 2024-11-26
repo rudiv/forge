@@ -69,6 +69,14 @@ public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost
                     logger.LogTrace("AppHost exited with code {0} after {1}", o.Result.ExitCode, o.Result.RunTime);
                     startupTs.TrySetResult(false);
                 }, TaskContinuationOptions.ExecuteSynchronously);
+                // Is this enough? Argument?
+                var timeoutTask = Task.Delay(15_000);
+                var startWithTimeout = await Task.WhenAny(startupTs.Task, timeoutTask);
+                if (timeoutTask.IsCompleted)
+                {
+                    startupTs.TrySetResult(false);
+                }
+
                 var started = await startupTs.Task;
                 if (started)
                 {
@@ -76,7 +84,7 @@ public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost
                 }
                 else
                 {
-                    AnsiConsole.MarkupLine("[red]:fire_extinguisher: forge failed to fire. This probably means your AppHost failed to build.[/]");
+                    AnsiConsole.MarkupLine("[red]:collision: forge failed to fire. This probably means your AppHost failed to build.[/]");
                     if (!settings.ShowBuildOutput)
                     {
                         AnsiConsole.MarkupLine("Re-run forge with --apphost-build-output to see the build output.");
