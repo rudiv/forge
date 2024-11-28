@@ -1,7 +1,5 @@
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using Forge.Cli.Dcp;
 using Forge.Cli.Dcp.ExecutionModel;
 using Forge.Cli.Infra;
@@ -11,7 +9,7 @@ using Spectre.Console.Cli;
 
 namespace Forge.Cli.Commands;
 
-public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost dcpSessionWebHost, Endpoints endpoints, ILogger<WatchCommand> logger) : AsyncCommand<WatchCommandSettings>
+public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost dcpSessionWebHost, ILogger<WatchCommand> logger) : AsyncCommand<WatchCommandSettings>
 {
     public override async Task<int> ExecuteAsync(CommandContext context, WatchCommandSettings settings)
     {
@@ -30,8 +28,7 @@ public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost
             .StartAsync(":fire: Firing...", async ctx =>
             {
                 ctx.Spinner(Spinner.Known.Hamburger);
-                if (settings.NoHotReload) endpoints.SetNoHotReload();
-                await dcpSessionWebHost.StartWebHostAsync(settings.Port);
+                await dcpSessionWebHost.StartWebHostAsync(settings.Port, !settings.NoHotReload);
                 var startupTs = new TaskCompletionSource<bool>();
                 wrapper = new DotnetWrapper(o =>
                 {

@@ -1,11 +1,6 @@
-using System.Collections.Specialized;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Channels;
 using CliWrap;
-using CliWrap.EventStream;
 using Forge.Cli.Dcp.Data;
-using Microsoft.Extensions.Logging;
 using Spectre.Console;
 
 namespace Forge.Cli.Dcp.ExecutionModel;

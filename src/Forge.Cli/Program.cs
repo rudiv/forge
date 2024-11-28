@@ -1,7 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using Forge.Cli;
 using Forge.Cli.Commands;
 using Forge.Cli.Dcp;
@@ -23,7 +21,6 @@ registrations.AddSingleton<AppHostResolution>();
 registrations.AddSingleton<DcpSessionWebHost>();
 registrations.AddSingleton<NotificationStreamHandler>();
 registrations.AddSingleton<ManagedSessionRegistry>();
-registrations.AddSingleton<Endpoints>();
 var registrar = new TypeRegistrar(registrations);
 
 AnsiConsole.MarkupLine(@"[red]   (\_/)

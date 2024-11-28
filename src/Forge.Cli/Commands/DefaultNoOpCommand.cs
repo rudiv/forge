@@ -1,6 +1,4 @@
 using Forge.Cli.Infra;
-using Microsoft.Build.Construction;
-using Microsoft.Extensions.Logging;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
