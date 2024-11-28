@@ -10,6 +10,13 @@
         <Nullable>enable</Nullable>
         <AssemblyName>forge</AssemblyName>
         <PackAsTool>true</PackAsTool>
+        <PackageId>Forge</PackageId>
+        <RepositoryUrl>https://github.com/rudiv/Forge</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>forge,aspire,docker,container,watch,dotnet</PackageTags>
+        <Description>
+            An alternative deployment tool and watcher for .NET Aspire.
+        </Description>
         <ToolCommandName>forge</ToolCommandName>
         <MinVerMinimumMajorMinor>0.1</MinVerMinimumMajorMinor>
         <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
