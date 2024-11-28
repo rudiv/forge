@@ -3,6 +3,19 @@ Forge is an alternative deployment tool for [.NET Aspire](https://learn.microsof
 
 _It also fixes `dotnet watch` on Aspire 9 projects until the a newer .NET SDK is out._
 
+## Getting Started
+
+Install the tool.
+```
+dotnet tool install --global R.Forge --prerelease
+```
+
+Watch your AppHost project. Note that `--no-hot-reload` is recommended for your projects so that new files
+are generally picked up better, also .NET 9's dotnet watch is pretty broken.
+```
+forge fire --no-hot-reload
+```
+
 ## Reasons
 
 azd is great but contains a lot of non-customisable magic, such as creating its own Container Registry and magical environments that aren't controllable in any way. It also only supports ACA as a deployment target.

@@ -10,7 +10,7 @@
         <Nullable>enable</Nullable>
         <AssemblyName>forge</AssemblyName>
         <PackAsTool>true</PackAsTool>
-        <PackageId>Forge</PackageId>
+        <PackageId>R.Forge</PackageId>
         <RepositoryUrl>https://github.com/rudiv/Forge</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>forge,aspire,docker,container,watch,dotnet</PackageTags>
