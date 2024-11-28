@@ -37,3 +37,7 @@ This tool will create all of the Bicep necessary for creating the entire environ
 - [ ] Support ACA deployment target
 - [ ] Support AppService deployment target
 - [x] Add dotnet watch support back to individual projects
+
+## Raising issues
+
+The environment variable `FORGE_DEBUG=1` will enable logging, if you're posting an issue please make sure that you post the complete output (redacted project names is fine).
