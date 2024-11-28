@@ -13,7 +13,7 @@ This tool will create all of the Bicep necessary for creating the entire environ
 
 ## Proposed usage
 
-- `forge fire|watch` - Fires up the app for local development
+- `forge fire|watch [--no-hot-reload] [--apphost-build-output]` - Fires up the app for local development
 - `forge temper|prepare [-env {dev}]` - Generate the relevant configuration files
 - `forge forge|deploy [-env {dev}]` - Meta af. Deploy to the cloud!
 

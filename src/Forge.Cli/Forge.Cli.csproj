@@ -17,6 +17,7 @@
         <Description>
             An alternative deployment tool and watcher for .NET Aspire.
         </Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <ToolCommandName>forge</ToolCommandName>
         <MinVerMinimumMajorMinor>0.1</MinVerMinimumMajorMinor>
         <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
@@ -27,5 +28,9 @@
       <PackageReference Include="Microsoft.Build" Version="17.12.6" />
       <PackageReference Include="MinVer" Version="6.0.0" />
       <PackageReference Include="Spectre.Console.Cli" Version="0.49.2-preview.0.53" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 </Project>
