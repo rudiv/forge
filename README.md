@@ -30,7 +30,7 @@ This tool will create all of the Bicep necessary for creating the entire environ
 - `forge temper|prepare [-env {dev}]` - Generate the relevant configuration files
 - `forge forge|deploy [-env {dev}]` - Meta af. Deploy to the cloud!
 
-- ## Goals
+## Goals
 
 - [ ] Create reusable Bicep files
 - [ ] Support multiple environments for deployment that can be committed to CI
