@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using System.Globalization;
+using System.Net;
+using System.Net.Sockets;
 using Forge.Cli.Dcp;
 using Forge.Cli.Dcp.ExecutionModel;
 using Forge.Cli.Infra;
@@ -18,6 +20,14 @@ public class WatchCommand(AppHostResolution appHostResolution, DcpSessionWebHost
             AnsiConsole.MarkupLine(
                 "[red]No AppHost project was found, you need to run forge from within the Solution or AppHost project folder.[/]");
             return 1;
+        }
+
+        if (settings.Port == 0)
+        {
+            // Find a usable port
+            using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket.Bind(new IPEndPoint(IPAddress.Loopback, 0));
+            settings.Port = ((IPEndPoint)socket.LocalEndPoint!).Port;
         }
         
         var withoutExt = Path.GetFileNameWithoutExtension(appHostResolution.AppHostPath);
@@ -107,7 +117,7 @@ public class WatchCommandSettings : CommandSettings
     public bool NoHotReload { get; set; }
     
     [CommandOption("-p|--port")]
-    [DefaultValue(6969)]
+    [DefaultValue(0)]
     [Description("Set the runtime port for the DCP Integration host.")]
     public int Port { get; set; }
 }
